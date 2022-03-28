@@ -3,6 +3,7 @@ clear all; clc; close all;
 %main_ode45%
 %Diffusion equation w source term
 %Include theta/pressure coupling
+%fixrate varying pmax
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global p_cur p_pre %Current pressure
 dt_factor = 1;
@@ -10,10 +11,12 @@ dt_factor = 1;
 %%%%%%%%%%Without Pressure%%%%%%%%%%
 %add for loop
 injection_end_time_list = [];
-m_input_list = [0.5]; %pmax=1.5e7 2.4e7 3.3e7  (sigma_initial=5.0e7)
+% m_input_list = [1]; %pmax=1.5e7 2.4e7 3.3e7  (sigma_initial=5.0e7)
+threshold_value_list = [5e6 7.5e6]; % 5% 10% 15%
 % Q_input_list = [1e4];
-for i = 1:length(m_input_list)
-    m_input = m_input_list(i);
+for tv_index = 1:length(threshold_value_list)
+    threshold_value = threshold_value_list(tv_index);
+    m_input = 1;
     %time
     t_min = 0;
     t_max = 1e4;
@@ -136,7 +139,6 @@ for i = 1:length(m_input_list)
     %initialize counter
     counter = 1;
     %Set threshold value % 7.5e6 -> 15% normal stress
-    threshold_value = 7.5e6;
     injection_tag = true;
     while t_pre < t_max
         %update pressure at the center
@@ -172,15 +174,15 @@ for i = 1:length(m_input_list)
 %         res(counter,7) = - sign(y(end,3)+coeff3) * ( coeff2 * y(end,4) ) * ( f_o + a * log(abs(y(end,3)+coeff3)) + b * log(abs(y(end,1))));
         %Plot slider velocity vs time %check
         if mod(counter,round(1/t_step)*200) == 0 %plot velocity vs time every 500 time steps
-            figure(99 + 199 * i)
+            figure(99 + 199 * tv_index + 10086)
             plot(res(1:counter,6),res(1:counter,4)); hold on
-            title('test'+string(i)+'velocity')
+            title('test'+string(tv_index)+'velocity')
             pause(0.5)
         end
         if mod(counter,round(1/t_step)*200) == 0 %plot pressure vs time every 500 time steps
-            figure(100 + 199 * i)
+            figure(100 + 199 * tv_index + 10086)
             plot(res(1:counter,6),res(1:counter,1)); hold on
-            title('test'+string(i)+'pressure_center')
+            title('test'+string(tv_index)+'pressure_center')
             pause(0.5)
         end
 %         if mod(counter,1e3*20) == 0 %plot psi vs time every 500 time steps
@@ -193,9 +195,9 @@ for i = 1:length(m_input_list)
         if mod(counter,round(1/t_step)*200) == 0 
             p_list = [p_list ; p(end,:)];
             t_list = [t_list t_pre+t_step];
-            figure(101)
+            figure(101 + 10086)
             plot(p(end,:)); hold on
-            title('test'+string(i)+'spatial')
+            title('test'+string(tv_index)+'spatial')
             pause(0.5)
         end
         p0 = p(end,:);
@@ -212,10 +214,10 @@ for i = 1:length(m_input_list)
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%post-processing%%%%%%%%%%%%%%%%%%%
-    %save results
-    writematrix(t_list,'spatial_case3_time.txt')
-    writematrix(p_list,'spatial_case3_pressure.txt')
-    writematrix(res,'res_case3_factors.txt')
+    %save results %must be double quote1
+    writematrix(t_list,"spatial"+"_"+"fixrate"+"_"+string(threshold_value)+"_"+"time.txt")
+    writematrix(p_list,"spatial"+"_"+"fixrate"+"_"+string(threshold_value)+"_"+"pressure.txt")
+    writematrix(res,"res"+"_"+"fixrate"+"_"+string(threshold_value)+"_"+"factors.txt")
 end
 
 %print injection end time
