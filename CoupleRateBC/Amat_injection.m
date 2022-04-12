@@ -5,8 +5,8 @@ function [A_mat] = Amat_injection(x,D_c,Lx) %D_c = L / v_o / (phi * ct * mu )
    %get left,right k value for each node
    k_list = zeros(length(x),2);
    for i = 1:n
-       k_left = k(x(i)-0.5);
-       k_right = k(x(i)+0.5);
+       k_left = permeability(x(i)-0.5*dx);
+       k_right = permeability(x(i)+0.5*dx);
        k_list(i,1) = k_left;
        k_list(i,2) = k_right;
    end

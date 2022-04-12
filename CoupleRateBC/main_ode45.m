@@ -1,26 +1,24 @@
 clear all; clc; close all;
+format long
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %main_ode45%
 %Diffusion equation w source term
 %Include theta/pressure coupling
-%fixrate varying pmax
+dt_factor = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global p_cur p_pre %Current pressure
-dt_factor = 1;
 % global max_p %Maximum pressure 
 %%%%%%%%%%Without Pressure%%%%%%%%%%
 %add for loop
 injection_end_time_list = [];
-% m_input_list = [1]; %pmax=1.5e7 2.4e7 3.3e7  (sigma_initial=5.0e7)
-threshold_value_list = [5e6 7.5e6]; % 5% 10% 15%
+m_input_list = [0.75 0.5]; %pmax=1.5e7 2.4e7 3.3e7  (sigma_initial=5.0e7)
 % Q_input_list = [1e4];
-for tv_index = 1:length(threshold_value_list)
-    threshold_value = threshold_value_list(tv_index);
-    m_input = 1;
+for i = 1:length(m_input_list)
+    m_input = m_input_list(i);
     %time
-    t_min = 0;
+    t_min = 1000;
     t_max = 1e4;
-    t_step = 1e-3 * dt_factor; %tunedp
+    t_step = 1e-3; %tunedp %1e-3
     numofval = length(t_min:t_step:t_max)-1;
     %Constant Variables
     V_p = 1e-9; %constant plate velocity
@@ -59,9 +57,12 @@ for tv_index = 1:length(threshold_value_list)
     
     %%%%%%%%%%Include Pressure%%%%%%%%%%
     %Generate 1D mesh
-    n_start = -200;
-    n_end = 200;
-    n_num = 401;
+    %------------------%
+    %Increase domain%
+    n_start = -200 * 2;
+    n_end = 200 * 2;
+    n_num = 400 * 2 + 1;
+    %------------------%
     x = linspace(n_start,n_end,n_num);
     dx = x(2) - x(1);
     %Constant variable (for now)
@@ -123,22 +124,23 @@ for tv_index = 1:length(threshold_value_list)
 %     u0 = y_ss(end,2); %-62.437688273140900
 %     v0 = y_ss(end,3); %-0.999969422154186
     
-    % %%%%%%%%%%%%%For k=0.8k_cr%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     theta0 = 7.915313563264281;
-%     u0 = -62.437688273140900;
-%     v0 = -0.999969422154186;
+    % %%%%%%%%%%%%%For k=0.9k_cr @ t=1000 %%%%%%%%%%%%%%%%%%%%%%%%%%
+      theta0 = 6.075725949937613;
+      u0 = -57.383006716665875;
+      v0 = -0.999811679466282;
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 %     psi0 = 1;
-%     disp('Pre-simulation Done')
+    disp('Pre-simulation Done')
     %%%%%%%%%%%%%time integration%%%%%%%%%%%%%%%%%%%%%%%
     p_list = []; t_list=[]; %store spatial distribution
     %initialize time
-    t_pre = 0; %Get the time before perform increment
+    t_pre = 1000; %Get the time before perform increment
     t_inject_start = 1000;
     %t_inject_end = 3000;
     %initialize counter
     counter = 1;
-    %Set threshold value % 7.5e6 -> 15% normal stress
+    %Set threshold value % 7.5e6 -> 15% normal stress % 1e7 -> 20% normal stress
+    threshold_value = 7.5e6;
     injection_tag = true;
     while t_pre < t_max
         %update pressure at the center
@@ -158,13 +160,15 @@ for tv_index = 1:length(threshold_value_list)
         %Update diffusion equation (@t_pre -> @t_new=t_pre+t_step)
         [t1,p] = ode45(f1,[t_pre,t_pre+t_step],p0);
         %Update SBM system of equations (@t_pre -> @t_new=t_pre+t_step)
-        p_cur = p(end,ceil(end/2));
+        p_cur = p(ceil(end/2));
         %y results are for the (@t_new=t_pre+t_step)
-        options = odeset('RelTol',1e-6,'AbsTol',1e-6);
+        %options = odeset('RelTol',1e-6,'AbsTol',1e-6);
         %[t2,y] = ode15s(@(t,y)sbm_sys_test1(y,coeff1,coeff2,coeff3,coeff4,sigma_initial,f_o,a,b),[t_pre,t_pre+t_step],[theta0,u0,v0,psi0],options);
-        [t2,y] = ode23s(@(t,y)sbm_sys_test1(y,coeff1,coeff2,coeff3,coeff4,sigma_initial,f_o,a,b,t_step,alpha),[t_pre,t_pre+t_step],[theta0,u0,v0],options);
+        [t2,y] = ode15s(@(t,y)sbm_sys_test1(y,coeff1,coeff2,coeff3,coeff4,sigma_initial,f_o,a,b,t_step,alpha),[t_pre,t_pre+t_step],[theta0,u0,v0]);
         %Get new pressure at inject location (@t_new=t_pre+t_step)
         %Store Results (@t_new=t_pre+t_step)
+        t_new = t_pre + t_step;
+
         res(counter,1) = p_cur;
         res(counter,2) = y(end,1); %theta
         res(counter,3) = y(end,2); %u
@@ -172,17 +176,22 @@ for tv_index = 1:length(threshold_value_list)
 %         res(counter,5) = y(end,4); %psi
         res(counter,6) = t_pre+t_step; %time
 %         res(counter,7) = - sign(y(end,3)+coeff3) * ( coeff2 * y(end,4) ) * ( f_o + a * log(abs(y(end,3)+coeff3)) + b * log(abs(y(end,1))));
+
         %Plot slider velocity vs time %check
         if mod(counter,round(1/t_step)*200) == 0 %plot velocity vs time every 500 time steps
-            figure(99 + 199 * tv_index + 10086)
+            figure(99 + 199 * i)
             plot(res(1:counter,6),res(1:counter,4)); hold on
-            title('test'+string(tv_index)+'velocity')
+            title('test'+string(i)+'velocity')
             pause(0.5)
+            disp('#-------------------#')
+            disp('# Current Velocity  #')
+            disp('#-------------------#')
+            disp(y(end,3))
         end
         if mod(counter,round(1/t_step)*200) == 0 %plot pressure vs time every 500 time steps
-            figure(100 + 199 * tv_index + 10086)
+            figure(100 + 199 * i)
             plot(res(1:counter,6),res(1:counter,1)); hold on
-            title('test'+string(tv_index)+'pressure_center')
+            title('test'+string(i)+'pressure_center')
             pause(0.5)
         end
 %         if mod(counter,1e3*20) == 0 %plot psi vs time every 500 time steps
@@ -195,9 +204,9 @@ for tv_index = 1:length(threshold_value_list)
         if mod(counter,round(1/t_step)*200) == 0 
             p_list = [p_list ; p(end,:)];
             t_list = [t_list t_pre+t_step];
-            figure(101 + 10086)
+            figure(101)
             plot(p(end,:)); hold on
-            title('test'+string(tv_index)+'spatial')
+            title('test'+string(i)+'spatial')
             pause(0.5)
         end
         p0 = p(end,:);
@@ -214,10 +223,11 @@ for tv_index = 1:length(threshold_value_list)
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%post-processing%%%%%%%%%%%%%%%%%%%
+    %save results
     %save results %must be double quote1
-    writematrix(t_list,"spatial"+"_"+"fixrate"+"_"+string(threshold_value)+"_"+"time.txt")
-    writematrix(p_list,"spatial"+"_"+"fixrate"+"_"+string(threshold_value)+"_"+"pressure.txt")
-    writematrix(res,"res"+"_"+"fixrate"+"_"+string(threshold_value)+"_"+"factors.txt")
+    writematrix(t_list,"spatial"+"_"+"fixpmax"+"_"+string(m_input)+"_"+"time.txt")
+    writematrix(p_list,"spatial"+"_"+"fixpmax"+"_"+string(m_input)+"_"+"pressure.txt")
+    writematrix(res,"res"+"_"+"fixpmax"+"_"+string(m_input)+"_"+"factors.txt")
 end
 
 %print injection end time
