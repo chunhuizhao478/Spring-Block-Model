@@ -46,22 +46,24 @@ tau3   = res3(:,7);
 %%%%velocity%%%%
 %Overview%
 f1 = figure(1);
-f1.Position = [0 0 1000 500];
-semilogx(t1,v1,'k-','LineWidth',1.5);hold on
-semilogx(t2,v2,'b-','LineWidth',1.5);hold on
-semilogx(t3,v3,'r-','LineWidth',1.5);hold on
+f1.Position = [0 0 2000 1000];
+plot(t1,v1,'k-','LineWidth',1.5);hold on
+plot(t2,v2,'b-','LineWidth',1.5);hold on
+plot(t3,v3,'r-','LineWidth',1.5);hold on
 % semilogx(t4,v4,'-','Color','#77AC30','LineWidth',1.5);
-title('slider velocity v.s. time [PBC]')
-xlabel('time')
-ylabel('slider velocity')
-xlim([400,2000])
+title('slider velocity $$\hat{v}$$ v.s. time $$\hat{t}$$ [PBC]','interpreter','latex','FontSize',20)
+xlabel('time $$\hat{t}$$','interpreter','latex','FontSize',20)
+ylabel('slider velocity $$\hat{v}$$','interpreter','latex','FontSize',20)
+xlim([0,2000])
 ylim([0, 7000])
-xline(0,'m-.',{'Velocity','Perturbation'}) %Initial Velocity Perturbation
-xline(400,'m-.',{'Injection','Start Increase'}) %Injection starting point
-xline(533,'m-.',{'Injection','Reach Maximum'}) 
-xline(1000,'m-.',{'Extraction','Start Decrease'}) %Injection end point
-xline(1133,'m-.',{'Extraction','Reach Minimum'})
-legend('p_{max}=2.5e6 [5%]','p_{max}=5e6 [10%]','p_{max}=7.5e6 [15%]')
+xline(0,'m-.',{'Velocity','Perturbation'},FontSize = 16) %Initial Velocity Perturbation
+xline(400,'m-.',{'Injection','Start Increase'},FontSize = 16) %Injection starting point
+xline(533,'m-.',{'Injection','Reach Maximum'},FontSize = 16) 
+xline(1000,'m-.',{'Extraction','Start Decrease'},FontSize = 16) %Injection end point
+xline(1133,'m-.',{'Extraction','Reach Minimum'},FontSize = 16)
+legend('$\hat{p}_{max} = 0.05$','$\hat{p}_{max} = 0.1$','$\hat{p}_{max} = 0.15$','Interpreter','latex',FontSize = 16)
+ax = gca; 
+ax.FontSize = 16;
 
 % %Around injection period%
 % figure(2);
@@ -114,24 +116,25 @@ t3_plot = t3(locs3); t3_plot = t3_plot(2:end);
 
 f3 = figure(3);
 f3.Position = [0 0 1000 500];
-plot1 = loglog(t1_plot,intersesmic_list1,'ks-','LineWidth',1.5); hold on
-plot2 = loglog(t2_plot,intersesmic_list2,'bo-','LineWidth',1.5); hold on
-plot3 = loglog(t3_plot,intersesmic_list3,'rd-','LineWidth',1.5); hold on
+plot1 = loglog(t1_plot,intersesmic_list1,'ks','LineWidth',1.5); hold on
+plot2 = loglog(t2_plot,intersesmic_list2,'bo','LineWidth',1.5); hold on
+plot3 = loglog(t3_plot,intersesmic_list3,'rd','LineWidth',1.5); hold on
 % plot4 = loglog(t4_plot,intersesmic_list4,'^-','Color','#77AC30','LineWidth',1.5);
 plot1.MarkerFaceColor = plot1.Color;
 plot2.MarkerFaceColor = plot2.Color;
 plot3.MarkerFaceColor = plot3.Color;
 % plot4.MarkerFaceColor = plot4.Color;
-title('Intersesmic Time [PBC]')
-xlabel('Time')
-ylabel('Intersesmic Time')
+title('interseismic time vs time $$\hat{t}$$ [PBC]','interpreter','latex','FontSize',20)
+xlabel('time $$\hat{t}$$','interpreter','latex','FontSize',20)
+ylabel('interseismic time','interpreter','latex','FontSize',20)
 xlim([400,2000])
-ylim([0, 1400])
-xline(400,'m-.',{'Injection','Start Increase'}) %Injection starting point
-xline(533,'m-.',{'Injection','Reach Maximum'}) 
-xline(1000,'m-.',{'Extraction','Start Decrease'}) %Injection end point
-xline(1133,'m-.',{'Extraction','Reach Minimum'})
-legend('p_{max}=2.5e6 [5%]','p_{max}=5e6 [10%]','p_{max}=7.5e6 [15%]')
+ylim([-1, 1400])
+xline(0,'m-.',{'Velocity','Perturbation'},FontSize = 16) %Initial Velocity Perturbation
+xline(400,'m-.',{'Injection','Start Increase'},FontSize = 16) %Injection starting point
+xline(533,'m-.',{'Injection','Reach Maximum'},FontSize = 16) 
+xline(1000,'m-.',{'Extraction','Start Decrease'},FontSize = 16) %Injection end point
+xline(1133,'m-.',{'Extraction','Reach Minimum'},FontSize = 16)
+legend('$\hat{p}_{max} = 0.05$','$\hat{p}_{max} = 0.1$','$\hat{p}_{max} = 0.15$','Interpreter','latex',FontSize = 16)
 
 locs1 = locs1/1e3;
 locs2 = locs2/1e3;
@@ -140,24 +143,42 @@ locs3 = locs3/1e3;
 
 f3_2 = figure(32);
 f3_2.Position = [0 0 1000 500];
-plot1 = semilogy(1:1:length(pks1),locs1,'ks-','LineWidth',1.5); hold on
-plot2 = semilogy(1:1:length(pks2),locs2,'bo-','LineWidth',1.5); hold on
-plot3 = semilogy(1:1:length(pks3),locs3,'rd-','LineWidth',1.5); hold on
+plot1 = semilogy(2:1:length(pks1),intersesmic_list1,'ks-','LineWidth',1.5); hold on
+plot2 = semilogy(2:1:length(pks2),intersesmic_list2,'bo-','LineWidth',1.5); hold on
+plot3 = semilogy(2:1:length(pks3),intersesmic_list3,'rd-','LineWidth',1.5); hold on
 % plot4 = semilogy(1:1:length(pks4),locs4,'^-','Color','#77AC30','LineWidth',1.5);
 plot1.MarkerFaceColor = plot1.Color;
 plot2.MarkerFaceColor = plot2.Color;
 plot3.MarkerFaceColor = plot3.Color;
 % plot4.MarkerFaceColor = plot4.Color;
-title('Event vs Time [PBC]')
-xlabel('Event Number')
-ylabel('Time')
-xlim([0, inf])
-ylim([0, inf])
-yline(400,'m-.',{'Injection','Start Increase'}) %Injection starting point
-yline(533,'m-.',{'Injection','Reach Maximum'}) 
-yline(1000,'m-.',{'Extraction','Start Decrease'}) %Injection end point
-yline(1133,'m-.',{'Extraction','Reach Minimum'})
-legend('p_{max}=2.5e6 [5%]','p_{max}=5e6 [10%]','p_{max}=7.5e6 [15%]')
+title('event vs interseismic time [PBC]','interpreter','latex','FontSize',20)
+xlabel('event number','interpreter','latex','FontSize',20)
+ylabel('intersesmic time','interpreter','latex','FontSize',20)
+xlim([0, 110])
+ylim([0, 600])
+legend('$\hat{p}_{max} = 0.05$','$\hat{p}_{max} = 0.1$','$\hat{p}_{max} = 0.15$','Interpreter','latex',FontSize = 16)
+
+f3_3 = figure(39);
+f3_3.Position = [0 0 1000 500];
+plot1 = semilogy(1:1:length(pks1),locs1,'ks','LineWidth',1.5); hold on
+plot2 = semilogy(1:1:length(pks2),locs2,'bo','LineWidth',1.5); hold on
+plot3 = semilogy(1:1:length(pks3),locs3,'rd','LineWidth',1.5); hold on
+% plot4 = semilogy(1:1:length(pks4),locs4,'^-','Color','#77AC30','LineWidth',1.5);
+plot1.MarkerFaceColor = plot1.Color;
+plot2.MarkerFaceColor = plot2.Color;
+plot3.MarkerFaceColor = plot3.Color;
+% plot4.MarkerFaceColor = plot4.Color;
+title('event vs time $$\hat{t}$$ [PBC]','interpreter','latex','FontSize',20)
+xlabel('event number','interpreter','latex','FontSize',20)
+ylabel('time $$\hat{t}$$','interpreter','latex','FontSize',20)
+xlim([0, 110])
+ylim([0, 2000])
+yline(0,'m-.',{'Velocity','Perturbation'},FontSize = 16) %Initial Velocity Perturbation
+yline(400,'m-.',{'Injection','Start Increase'},FontSize = 16) %Injection starting point
+yline(533,'m-.',{'Injection','Reach Maximum'},FontSize = 16) 
+yline(1000,'m-.',{'Extraction','Start Decrease'},FontSize = 16) %Injection end point
+yline(1133,'m-.',{'Extraction','Reach Minimum'},FontSize = 16)
+legend('$\hat{p}_{max} = 0.05$','$\hat{p}_{max} = 0.1$','$\hat{p}_{max} = 0.15$','Interpreter','latex',FontSize = 16)
 
 % %Plot displacement%
 % figure(4);
@@ -227,20 +248,20 @@ plot(t1,p1,'k-','LineWidth',1.5);hold on
 plot(t2,p2,'b-','LineWidth',1.5);hold on
 plot(t3,p3,'r-','LineWidth',1.5);hold on
 % plot(t4,p4,'-','Color','#77AC30','LineWidth',1.5);
-title('pressure v.s. time [PBC,center point]')
-xlabel('time')
-ylabel('pressure')
+title('pressure $$\hat{P}$$ v.s. time $\hat{t}$ [PBC]','interpreter','latex','FontSize',20);
+xlabel('time $$\hat{t}$$','interpreter','latex','FontSize',20);
+ylabel('pressure $$\hat{P}$$','interpreter','latex','FontSize',20);
 xlim([0,2000])
 ylim([0,0.2])
-xline(0,'m-.',{'Velocity','Perturbation'}) %Initial Velocity Perturbation
-xline(400,'m-.',{'Injection','Start Increase'}) %Injection starting point
-xline(533,'m-.',{'Injection','Reach Maximum'}) 
-xline(1000,'m-.',{'Extraction','Start Decrease'}) %Injection end point
-xline(1133,'m-.',{'Extraction','Reach Minimum'})
-yline(2.5e6/50e6,'m--',{'5% of normal stress'})
-yline(5e6/50e6,'m--',{'10% of normal stress'})
-yline(7.5e6/50e6,'m--',{'15% of normal stress'})
-legend('p_{max}=2.5e6 [5%]','p_{max}=5e6 [10%]','p_{max}=7.5e6 [15%]')
+xline(0,'m-.',{'Velocity','Perturbation'},FontSize = 16) %Initial Velocity Perturbation
+xline(400,'m-.',{'Injection','Start Increase'},FontSize = 16) %Injection starting point
+xline(533,'m-.',{'Injection','Reach Maximum'},FontSize = 16) 
+xline(1000,'m-.',{'Extraction','Start Decrease'},FontSize = 16) %Injection end point
+xline(1133,'m-.',{'Extraction','Reach Minimum'},FontSize = 16)
+yline(2.5e6/50e6,'m--','5 percent of normal stress, $$k < k_{cr}$$','Interpreter','latex',FontSize = 16)
+yline(5e6/50e6,'m--','10 percent of normal stress, $$k = k_{cr}$$','Interpreter','latex',FontSize = 16)
+yline(7.5e6/50e6,'m--','15 percent of normal stress, $$k > k_{cr}$$','Interpreter','latex',FontSize = 16)
+legend('$\hat{p}_{max} = 0.05$','$\hat{p}_{max} = 0.1$','$\hat{p}_{max} = 0.15$','Interpreter','latex',FontSize = 16)
 ax = gca; 
 ax.FontSize = 16;
 
